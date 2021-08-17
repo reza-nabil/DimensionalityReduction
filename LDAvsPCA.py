@@ -9,37 +9,52 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.datasets import load_iris
 from sklearn.neighbors import KNeighborsClassifier as KNN
 from sklearn.model_selection import train_test_split
-
+from sklearn.metrics import mean_squared_error as mse
 # dataset loading
 iris = load_iris()
-x_train, x_test, y_train, y_test = train_test_split(iris.data,
-                                                    iris.target,
-                                                    test_size = 0.3,
-                                                    random_state = 20)
 
 
 #feature extraction --> with PCA and LDA
 num_components = 2
 
 pca_obj = PCA(n_components = num_components)
-X_new_pca = pca_obj.fit_transform(x_train)
+X_new_pca = pca_obj.fit_transform(iris.data)
 
 lda_obj = LDA(n_components = num_components)
-X_new_lda = lda_obj.fit_transform(x_train, y_train)
+X_new_lda = lda_obj.fit_transform(iris.data, iris.target)
+
+# split new data --> to train and test Data
+x_train_pca, x_test_pca, y_train_pca, y_test_pca = train_test_split(X_new_pca,
+                                                                    iris.target,
+                                                                    test_size = 0.3,
+                                                                    random_state = 20)
+
+x_train_lda, x_test_lda, y_train_lda, y_test_lda = train_test_split(X_new_lda,
+                                                                    iris.target,
+                                                                    test_size = 0.3,
+                                                                    random_state = 20)
 
 
 # model fiting (train model) / classification --> with KNN
 num_neighbors = 5
 
 knn_obj_pca = KNN(n_neighbors=num_neighbors)
-knn_obj_pca.fit(X_new_pca, y_train)
-y_pca = knn_obj_pca.predict(X_new_pca)
+knn_obj_pca.fit(x_train_pca, y_train_pca)
+
 
 knn_obj_lda = KNN(n_neighbors=num_neighbors)
-knn_obj_lda.fit(X_new_lda, y_train)
-y_lda = knn_obj_lda.predict(X_new_lda)
+knn_obj_lda.fit(x_train_lda, y_train_lda)
+
+
 
 # testing model (predict)
+y_pred_lda = knn_obj_lda.predict(x_test_lda)
+performance_lda = mse(y_test_lda, y_pred_lda)
+
+y_pred_pca = knn_obj_pca.predict(x_test_pca)
+performance_pca = mse(y_test_pca, y_pred_pca)
+
+
 # show Result
-print('LDA performance: ', np.sum((y_train == y_lda)/len(y_train)))
-print('PCA performance: ', np.sum((y_train == y_pca)/len(y_train)))
+print('LDA performance: ', performance_lda)
+print('PCA performance: ', performance_pca)
