@@ -4,12 +4,16 @@
 
 # import libs
 import numpy as np
+import matplotlib.pyplot as plt
+
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.datasets import load_iris
 from sklearn.neighbors import KNeighborsClassifier as KNN
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error as mse
+
+
 # dataset loading
 iris = load_iris()
 
@@ -58,3 +62,12 @@ performance_pca = mse(y_test_pca, y_pred_pca)
 # show Result
 print('LDA performance: ', performance_lda)
 print('PCA performance: ', performance_pca)
+
+
+plt.subplot(1, 2, 1)
+plt.scatter(x_test_lda[:,0], x_test_lda[:,1], c=y_test_lda)
+plt.title("LDA")
+
+plt.subplot(1, 2, 2)
+plt.scatter(x_test_pca[:,0], x_test_pca[:,1], c=y_test_pca)
+plt.title("PCA")
